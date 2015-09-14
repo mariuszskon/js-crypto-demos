@@ -1,9 +1,7 @@
 // A Caesar cipher implementation with support for custom alphabets
 
-var plaintext;
+var inputtext;
 var key;
-var illp;
-var allp;
 
 var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
 var origalphabet = alphabet;
@@ -23,89 +21,58 @@ var outputbox = gid("outputbox");
 
 function updatevars() {
     
-    plaintext = plaintextbox.value;
+    inputtext = plaintextbox.value;
     key = parseInt(keybox.value);
-    illp = plaintext.length - 1; // the position of the last letter in the input
-    allp = alphabet.length - 1; // the position of the last letter in the alphabet
+    
+}
+
+function crypt(mode) {
+    
+    updatevars();
+    
+    var outputtext = "";
+    
+    if (key < 1 || key > (alphabet.length - 1)) {
+        outputtext = "Error: key was lower than 1 or greater than " + (alphabet.length - 1);
+        outputbox.innerHTML = outputtext;
+        return; // end the function
+    }
+    
+    for (var i = 0; i < inputtext.length; i++) { // loop through all of the inputtext
+        
+        var position = alphabet.indexOf(inputtext.charAt(i));
+        var l;
+        
+        if (mode === true) { // encryption mode
+            l = position + key;
+            
+            l = l % alphabet.length;
+        }
+        
+        if (mode === false) { // decryption mode
+            l = position - key;
+            
+            if (l < 0) {
+                
+                l = l + alphabet.length;
+                
+            }
+        }
+        outputtext += alphabet[l]; // put the outputtext letter in the ciphertext
+ 
+    }
+    
+    outputbox.innerHTML = outputtext; // finally put it in the output box
     
 }
 
 function encrypt() {
-    
-    updatevars();
-    
-    var ciphertext = "";
-    
-    if (key < 1 || key > allp) {
-        ciphertext = "Error: key was lower than 1 and greater than " + allp;
-        outputbox.innerHTML = ciphertext;
-        return; // end the function
-    }
-    
-    for (var i = 0; i <= illp; i++) { // loop through all of the plaintext
-        
-        for (var j = 0; j <= allp; j++) { // loop through the alphabet
-            
-            if (plaintext.charAt(i) === alphabet[j]) { // if the letter is the same in the plaintext and in the alphabet
-                
-                var l = j + key; // the position of the current letter in the alphabet plus the key
-                
-                if (l > allp) { // if we are further than the alphabet
-                    
-                    l = l - allp - 1; // aka doing l - alphabet.length
-                    
-                }
-                
-                ciphertext += alphabet[l]; // put the ciphertext letter in the ciphertext
-                
-            }
-            
-        }
-        
-    }
-    
-    outputbox.innerHTML = ciphertext; // finally put it in the output box
-    
+    crypt(true);
 }
 
 function decrypt() {
-    
-    updatevars();
-    
-    var plainoutput = "";
-    
-    if (key < 1 || key > allp) {
-        ciphertext = "Error: key was lower than 1 and greater than " + allp;
-        outputbox.innerHTML = ciphertext;
-        return; // end the function
-    }
-    
-    for (var i = 0; i <= illp; i++) { // loop through all of the plaintext
-        
-        for (var j = 0; j <= allp; j++) { // loop through the alphabet
-            
-            if (plaintext.charAt(i) === alphabet[j]) { // if the letter is the same in the plaintext and in the alphabet
-                
-                var l = j - key; // the position of the current letter in the alphabet minus the key
-                
-                if (l < 0) {
-                    
-                    l = l + allp + 1; // we need to add the length of the alphabet to make it above 0
-                    
-                }
-                
-                plainoutput += alphabet[l]; // put the ciphertext letter in the ciphertext
-                
-            }
-            
-        }
-        
-    }
-    
-    outputbox.innerHTML = plainoutput; // finally put it in the output box
-    
+    crypt(false);
 }
-
 
 document.getElementById("encryptbtn").addEventListener("click", encrypt);
 
