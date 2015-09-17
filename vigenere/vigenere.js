@@ -2,29 +2,7 @@
 
 var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
 
-function gid(id) {
-    return document.getElementById(id);
-}
-
-var inputbox = gid("input");
-
-var outputbox = gid("output");
-
-var keybox = gid("key");
-
-var encryptbtn = gid("encryptbtn");
-
-var decryptbtn = gid("decryptbtn");
-
-var input, key;
-
-function updatevars() {
-    // strip spaces
-    input = inputbox.value.replace(/ /g, "");
-    key = keybox.value.replace(/ /g, "");
-}
-
-function getKeyLetterAlphabetPosition(number) { // take number as the position of the input letter, so that we can match it with a key letter
+function getKeyLetterAlphabetPosition(number, key) { // take number as the position of the input letter, so that we can match it with a key letter
     var keyLetterPosition = number % key.length; // % uses modular arithmetic to "loop around", matching a number to the key letter position
     
     var keyLetterAtPosition = key.charAt(keyLetterPosition);
@@ -32,12 +10,8 @@ function getKeyLetterAlphabetPosition(number) { // take number as the position o
     return alphabet.indexOf(keyLetterAtPosition);
 }
 
-function crypt(mode) {
-    updatevars();
-    
+function crypt(mode, input, key) {
     var finaloutput = "";
-    
-    var beginTime = (new Date()).getTime();
     
     for (var i = 0; i < input.length; i++) {
         
@@ -47,17 +21,17 @@ function crypt(mode) {
             
         }
         
-        var j = alphabet.indexOf(input.charAt(i));
+        var inputLetterPosition = alphabet.indexOf(input.charAt(i));
         
         var finalLetterPosition = "";
         
         if (mode === true) { // encryption mode
             
-            finalLetterPosition = (j + getKeyLetterAlphabetPosition(i)) % alphabet.length; // add the position of the original letter witht he alphabet position of the corresponding key letter, and wrap around the alphabet length
+            finalLetterPosition = (inputLetterPosition + getKeyLetterAlphabetPosition(i, key)) % alphabet.length; // add the position of the original letter with the alphabet position of the corresponding key letter, and wrap around the alphabet length
             
         } else if (mode === false) { // decryption mode
             
-            var possibleLetterPosition = (j - getKeyLetterAlphabetPosition(i));
+            var possibleLetterPosition = (inputLetterPosition - getKeyLetterAlphabetPosition(i, key));
             
             if (possibleLetterPosition < 0) {
                 finalLetterPosition = possibleLetterPosition + alphabet.length; // if the number is negative, "loop around" by adding the length of the alphabet to it
@@ -71,21 +45,7 @@ function crypt(mode) {
         
     }
     
-    var endTime = (new Date()).getTime();
+    return finaloutput;
     
-    console.log("Ciphering operation took " + (endTime - beginTime) + " millisecond(s)");
-    
-    outputbox.innerHTML = finaloutput;
 }
 
-function encrypt() {
-    crypt(true);
-}
-
-function decrypt() {
-    crypt(false);
-}
-
-encryptbtn.addEventListener("click", encrypt);
-
-decryptbtn.addEventListener("click", decrypt);
